@@ -1,7 +1,21 @@
 import { Button, Menu, MenuHandler, MenuItem, MenuList } from '@material-tailwind/react'
-import { more } from '../../assets'
+import { more, plus } from '../../assets'
+import { AddTask, TaskItem } from '../'
+import { useRef, useState } from 'react';
 
 const Tasks = () => {
+
+    const addTaskRef = useRef(null)
+    
+
+    const [open, setOpen] = useState(false);
+
+    const handleOpen = (ref) => {
+        setOpen(!open)
+        console.log(ref.current);
+        // window.scroll({top: ref.current.offset.top, behavior: 'smooth'})
+    }
+
     return (
         <div className='py-3'>
             <span className='text-gray-400 hover:text-gray-600 cursor-pointer duration-150'>#1</span>
@@ -16,9 +30,31 @@ const Tasks = () => {
                         </Button>
                     </MenuHandler>
                     <MenuList>
-                        <MenuItem>Login</MenuItem>
+                        <MenuItem>Clear Finished Tasks</MenuItem>
+                        <MenuItem>Clear All Tasks</MenuItem>
                     </MenuList>
                 </Menu>
+            </div>
+            <div className="">
+                <div className="py-5">
+                    <TaskItem />
+                </div>
+                {!open ?
+                    <Button
+                        variant='outlined'
+                        className='w-full border-dashed border-2 bg-lightBlack text-white flex items-center justify-center gap-2 '
+                        onClick={handleOpen}
+                    >
+                        <img src={plus} alt="plus" className='w-8 text-white ' />
+                        Add Task
+                    </Button>
+                    :
+                    <div ref={addTaskRef}>
+                        <AddTask handleOpen={handleOpen} />
+
+                    </div>
+
+                }
             </div>
         </div>
     )
