@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
 import authReducer from '../slices/auth'
+import tasksReducer from '../slices/tasks'
 
 export default configureStore({
   reducer: {
-    auth: authReducer
+    auth: authReducer,
+    tasks: tasksReducer,
   },
   devTools: process.env.NODE_ENV !== "production",
 })

@@ -1,19 +1,48 @@
 import { Button, Menu, MenuHandler, MenuItem, MenuList } from '@material-tailwind/react'
 import { more, plus } from '../../assets'
 import { AddTask, TaskItem } from '../'
-import { useRef, useState } from 'react';
+import { useState } from 'react';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { updateTasks } from '../../slices/tasks';
 
 const Tasks = () => {
-
-    const addTaskRef = useRef(null)
-    
-
     const [open, setOpen] = useState(false);
 
-    const handleOpen = (ref) => {
+
+    const { tasks } = useSelector(state => state.tasks)
+
+    const dispatch = useDispatch()
+
+    const handleOpen = () => {
         setOpen(!open)
-        console.log(ref.current);
-        // window.scroll({top: ref.current.offset.top, behavior: 'smooth'})
+    }
+
+    const handleDrapAndDrop = (result) => {
+        const { destination, source } = result
+
+        if (!destination) return;
+
+        if (source.droppableId === destination.droppableId && source.index === destination.index) return;
+
+        const reorderedData = [...tasks]
+        const sourceIndex = source.index
+        const destinationIndex = destination.index
+
+        const [removedItem] = reorderedData.splice(sourceIndex, 1)
+        reorderedData.splice(destinationIndex, 0, removedItem)
+
+        dispatch(updateTasks(reorderedData))
+    }
+
+    const clearAllTasksHandler = () => {
+        dispatch(updateTasks([]))
+    }
+
+    const clearFinishedTasksHandler = () => {
+        const filteredTasks = tasks.filter(task => !task.isFinished)
+        dispatch(updateTasks(filteredTasks))
     }
 
     return (
@@ -30,15 +59,41 @@ const Tasks = () => {
                         </Button>
                     </MenuHandler>
                     <MenuList>
-                        <MenuItem>Clear Finished Tasks</MenuItem>
-                        <MenuItem>Clear All Tasks</MenuItem>
+                        <MenuItem onClick={clearFinishedTasksHandler}>Clear Finished Tasks</MenuItem>
+                        <MenuItem onClick={clearAllTasksHandler}>Clear All Tasks</MenuItem>
                     </MenuList>
                 </Menu>
             </div>
             <div className="">
-                <div className="py-5">
-                    <TaskItem />
-                </div>
+
+                <DragDropContext onDragEnd={handleDrapAndDrop}>
+                    <Droppable droppableId="ROOT" type="group">
+                        {(provided) => (
+                            <div {...provided.droppableProps} ref={provided.innerRef} className='py-5 '>
+                                {tasks.map((item, index) => (
+                                    <Draggable
+                                        draggableId={item.id}
+                                        index={index}
+                                        key={item.id}
+                                    >
+                                        {(provided) => (
+                                            <div
+                                                {...provided.dragHandleProps}
+                                                {...provided.draggableProps}
+                                                ref={provided.innerRef}
+                                                className='my-2'
+                                            >
+                                                <TaskItem item={item} index={index} />
+                                            </div>
+                                        )}
+                                    </Draggable>
+                                ))}
+                                {provided.placeholder}
+                            </div>
+                        )}
+                    </Droppable>
+                </DragDropContext>
+
                 {!open ?
                     <Button
                         variant='outlined'
@@ -49,13 +104,14 @@ const Tasks = () => {
                         Add Task
                     </Button>
                     :
-                    <div ref={addTaskRef}>
+                    <div>
                         <AddTask handleOpen={handleOpen} />
 
                     </div>
 
                 }
             </div>
+
         </div>
     )
 }

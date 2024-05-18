@@ -4,7 +4,6 @@ const initialState = {
   isLoading: false,
   user: [],
   error: null,
-  value: 0,
 };
 
 export const authSlice = createSlice({
@@ -22,14 +21,10 @@ export const authSlice = createSlice({
       state.isLoading = false;
       state.error = action.payload;
     },
-    increaseVal: (state, action) => {
-      state.value += action.payload;
-    },
   },
 });
 
-// Action creators are generated for each case reducer function
-export const { getUserStart, getUserSuccess, getUserFailure, increaseVal } =
+export const { getUserStart, getUserSuccess, getUserFailure } =
   authSlice.actions;
 
 export default authSlice.reducer;
