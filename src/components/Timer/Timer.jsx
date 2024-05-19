@@ -1,11 +1,16 @@
 import { Button } from '@material-tailwind/react';
 import { useEffect, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
+import { updateTasks } from '../../slices/tasks';
 
 const Timer = () => {
     const [active, setActive] = useState('Pomodoro');
     const [isStart, setIsStart] = useState(false);
     const { timers } = useSelector(state => state.timer);
+    const { tasks } = useSelector(state => state.tasks);
+
+    const dispatch = useDispatch()
 
     const [timer, setTimer] = useState({
         minute: 0,
@@ -24,13 +29,28 @@ const Timer = () => {
         }
     }, [active, timers]);
 
+    const finishTaskHandler = () => {
+        clearInterval(timerRef.current);
+        setIsStart(false)
+        setActive('Short Break')
+
+        const finishedTask = tasks.filter(task => task.isActive);
+        const filteredData = tasks.filter(task => !task.isActive);
+        const newTask = {
+            ...finishedTask[0],
+            isFinished: true
+        }
+        filteredData.push(newTask)
+
+        dispatch(updateTasks([...filteredData]))
+    }
+
     useEffect(() => {
         if (isStart) {
             const tick = () => {
                 setTimer(prevTimer => {
                     if (prevTimer.minute === 0 && prevTimer.second === 0) {
-                        clearInterval(timerRef.current);
-                        setIsStart(false)
+                        finishTaskHandler()
                         return prevTimer;
                     } else if (prevTimer.second === 0) {
                         return { minute: prevTimer.minute - 1, second: 59 };

@@ -1,7 +1,7 @@
 import { Button, Menu, MenuHandler, MenuItem, MenuList } from '@material-tailwind/react'
 import { more, plus } from '../../assets'
 import { AddTask, TaskItem } from '../'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
@@ -9,7 +9,7 @@ import { updateTasks } from '../../slices/tasks';
 
 const Tasks = () => {
     const [open, setOpen] = useState(false);
-
+    const [activeTask, setActiveTask] = useState('')
 
     const { tasks } = useSelector(state => state.tasks)
 
@@ -45,10 +45,20 @@ const Tasks = () => {
         dispatch(updateTasks(filteredTasks))
     }
 
+    useEffect(() => {
+        tasks.map(task => {
+            if (task.isActive) {
+                setActiveTask(task.title)
+            }
+        })
+    }, [activeTask, tasks]) 
+    
+    
+
     return (
         <div className='py-3'>
             <span className='text-gray-400 hover:text-gray-600 cursor-pointer duration-150'>#1</span>
-            <h2 className='text-white' >Time to focus</h2>
+            <h2 className='text-white' >{activeTask}</h2>
             <div className="flex justify-between border-b-2 py-2 ">
                 <span className='text-[20px] text-white '>Tasks</span>
 

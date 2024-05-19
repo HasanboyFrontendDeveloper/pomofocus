@@ -31,7 +31,6 @@ const Navbar = () => {
                         </MenuList>
                     </Menu>
                 </div>
-                <div className="h-1 bg-white w-[10%] absolute bottom-[-2px] "></div>
             </nav>
     )
 }

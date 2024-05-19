@@ -4,8 +4,8 @@ const initialState = {
   timers: [
     {
       title: "Pomodoro",
-      minute: 1,
-      second: 0,
+      minute: 0,
+      second: 5,
     },
     {
       title: "Short Break",
