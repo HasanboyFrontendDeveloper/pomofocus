@@ -1,5 +1,7 @@
 import React from 'react'
 import { Navbar, Tasks, Timer } from '../'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css';
 
 const Home = () => {
 
@@ -12,6 +14,7 @@ const Home = () => {
                     <Tasks />
                 </div>
             </div>
+            <ToastContainer />
         </div>
     )
 }

@@ -9,8 +9,8 @@ const initialState = {
     },
     {
       title: "Short Break",
-      minute: 1,
-      second: 30,
+      minute: 0,
+      second: 10,
     },
     {
       title: "Long Break",

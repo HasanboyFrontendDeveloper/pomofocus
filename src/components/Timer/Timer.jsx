@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { updateTasks } from '../../slices/tasks';
+import { toast } from 'react-toastify';
+import { checked, radar } from '../../assets';
 
 const Timer = () => {
     const [active, setActive] = useState('Pomodoro');
@@ -11,6 +13,7 @@ const Timer = () => {
     const { tasks } = useSelector(state => state.tasks);
 
     const dispatch = useDispatch()
+    const audioRef = useRef()
 
     const [timer, setTimer] = useState({
         minute: 0,
@@ -43,6 +46,12 @@ const Timer = () => {
         filteredData.push(newTask)
 
         dispatch(updateTasks([...filteredData]))
+        toast.success('Timer finished', {
+            theme: 'dark',
+            closeOnClick: true,
+            pauseOnHover: true,
+        })
+        console.log(audioRef.current.play());
     }
 
     useEffect(() => {
@@ -92,6 +101,8 @@ const Timer = () => {
             <Button color='white' className='w-40 text-[20px] text-red-400' onClick={() => setIsStart(!isStart)}>
                 {isStart ? 'Stop' : 'Start'}
             </Button>
+
+            <audio src={radar} ref={audioRef} ></audio>
         </div>
     );
 };

@@ -57,7 +57,7 @@ const Tasks = () => {
 
     return (
         <div className='py-3'>
-            <span className='text-gray-400 hover:text-gray-600 cursor-pointer duration-150'>#1</span>
+            <span className='text-gray-300 cursor-pointer duration-150'>Current Task</span>
             <h2 className='text-white' >{activeTask}</h2>
             <div className="flex justify-between border-b-2 py-2 ">
                 <span className='text-[20px] text-white '>Tasks</span>

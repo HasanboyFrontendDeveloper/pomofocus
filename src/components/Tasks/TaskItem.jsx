@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { reorderData } from "../../constants";
 import { useDispatch } from "react-redux";
 import { updateTasks } from "../../slices/tasks";
+import { toast } from "react-toastify";
 
 const TaskItem = ({ item, index }) => {
     const [open, setOpen] = useState(false);
@@ -29,6 +30,11 @@ const TaskItem = ({ item, index }) => {
 
 
         dispatch(updateTasks([...newData]))
+        toast.success('Task finished', {
+            theme: 'dark',
+            closeOnClick: true,
+            pauseOnHover: true,
+        })
     }
 
     const activeHandler = (e) => {
