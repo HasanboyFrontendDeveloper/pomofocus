@@ -1,9 +1,21 @@
 import { Button, Menu, MenuHandler, MenuItem, MenuList } from '@material-tailwind/react'
 import { checked, logout, more, settings, userIcon } from '../../assets'
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
+import { logOut } from '../../slices/auth'
 
-const Navbar = () => {
+const Navbar = ({ setOpenSettings }) => {
+
+    const { isLoggedIn } = useSelector(state => state.auth)
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
+
+    const logoutHandler = () => {
+        dispatch(logOut())
+        navigate('/login')
+    }
 
     return (
         <nav className="py-5 flex justify-between relative border-b-[1px] border-gray-500 ">
@@ -17,30 +29,23 @@ const Navbar = () => {
 
             <div className="flex items-center gap-4">
 
-                <Button variant="gradient" color='white' className='text-[10px] p-2 flex items-center ' >
+                <Button variant="gradient" color='white' className='text-[10px] p-2 flex items-center ' onClick={() => setOpenSettings(true)} >
                     <img src={settings} alt="settings" className='w-5' />
                     Settings
                 </Button>
 
-                <Link to={'/login'}>
-                    <Button variant="gradient" color='white' className='text-[10px] p-2 flex items-center ' >
-                        <img src={userIcon} alt="userIcon" className='w-5' />
-                        Sing In
-                    </Button>
-                </Link>
+                {isLoggedIn ?
+                    <Menu>
 
-                <Menu>
+                        <MenuHandler>
 
-                    <MenuHandler>
+                            <Button variant="gradient" color='white' className='text-[10px] py-[1px] px-[2px] '>
+                                <img src={userIcon} alt="more" className='w-9' />
+                            </Button>
 
-                        <Button variant="gradient" color='white' className='text-[10px] p-2 '>
-                            <img src={more} alt="more" className='w-5' />
-                        </Button>
-
-                    </MenuHandler>
-                    <MenuList>
-                        <MenuItem>
-                            <Link className='flex items-center '>
+                        </MenuHandler>
+                        <MenuList>
+                            <MenuItem className='flex items-center ' onClick={logoutHandler}>
                                 <div className="text-gray-600 hover:text-gray-900 ">
 
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
@@ -49,12 +54,20 @@ const Navbar = () => {
 
                                 </div>
 
-                                Login
-                            </Link>
-                        </MenuItem>
-                    </MenuList>
+                                Logout
+                            </MenuItem>
+                        </MenuList>
 
-                </Menu>
+                    </Menu>
+                    :
+                    <Link to={'/login'}>
+                        <Button variant="gradient" color='white' className='text-[10px] p-2 flex items-center ' >
+                            <img src={userIcon} alt="userIcon" className='w-5' />
+                            Sing In
+                        </Button>
+                    </Link>
+                }
+
             </div>
         </nav>
     )

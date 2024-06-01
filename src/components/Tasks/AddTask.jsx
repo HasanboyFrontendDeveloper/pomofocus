@@ -8,14 +8,14 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { updateTasks } from "../../slices/tasks";
-import { v4 } from 'uuid';
 import { reorderData } from "../../constants";
+import TasksService from "../../service/tasks";
 
 
 const AddTask = ({ handleOpen, item = null, index }) => {
     const [openNote, setOpenNote] = useState(false)
     const [value, setvalue] = useState({
-        title: item?.title || '',
+        content: item?.content || '',
         note: item?.note || '',
     })
 
@@ -38,11 +38,12 @@ const AddTask = ({ handleOpen, item = null, index }) => {
 
     const dispatch = useDispatch()
     const { tasks } = useSelector(state => state.tasks)
+    const { userId } = useSelector(state => state.auth)
 
 
-    const submitHandler = (e) => {
+    const submitHandler = async (e) => {
         e.preventDefault()
-        if (value.title === '') {
+        if (value.content === '') {
             alert('Please fill the field');
             return;
         };
@@ -52,7 +53,7 @@ const AddTask = ({ handleOpen, item = null, index }) => {
         if (item) {
             taskData = {
                 ...item,
-                title: value.title,
+                content: value.content,
                 note: value.note
             }
 
@@ -60,16 +61,26 @@ const AddTask = ({ handleOpen, item = null, index }) => {
 
             dispatch(updateTasks([...reorderedData]))
 
+            await TasksService.updateTask(taskData)
+
         } else {
             taskData = {
-                title: value.title,
-                note: value.note,
-                id: v4(),
+                user_id: `${userId}` || null,
+                content: value.content,
+                note: value.note || '',
+                isActive: 0,
+                isFinished: 0,
+                isDeleted: 0,
+                orderNumber: tasks.length,
             }
-            dispatch(updateTasks([...filterData, taskData]))
+            const { data } = await TasksService.postTasks(taskData)
+
+            const newItem = { ...data.task, id: String(data.task.id) }
+
+            dispatch(updateTasks([...filterData, newItem]))
         }
         setvalue({
-            title: '',
+            content: '',
             note: '',
         })
         if (item) {
@@ -77,9 +88,10 @@ const AddTask = ({ handleOpen, item = null, index }) => {
         }
     }
 
-    const deleteHandler = () => {
+    const deleteHandler = async () => {
         const filteredData = tasks.filter(task => task.id !== item.id)
         dispatch(updateTasks(filteredData))
+        await TasksService.deleteTask(item.id)
     }
 
     return (
@@ -88,8 +100,8 @@ const AddTask = ({ handleOpen, item = null, index }) => {
                 <Card className="w-full z-[2] " ref={scrollRef}>
                     <CardBody className="pb-0">
                         <Input variant="static" className="text-[25px] " placeholder="What are you working on"
-                            onChange={(e) => setvalue(prev => ({ ...prev, title: e.target.value }))}
-                            value={value.title}
+                            onChange={(e) => setvalue(prev => ({ ...prev, content: e.target.value }))}
+                            value={value.content}
                         />
 
                         {!openNote && !item?.note ?

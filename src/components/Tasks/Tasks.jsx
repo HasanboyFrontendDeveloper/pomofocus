@@ -6,6 +6,7 @@ import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { updateTasks } from '../../slices/tasks';
+import TasksService from '../../service/tasks';
 
 const Tasks = () => {
     const [open, setOpen] = useState(false);
@@ -19,7 +20,7 @@ const Tasks = () => {
         setOpen(!open)
     }
 
-    const handleDrapAndDrop = (result) => {
+    const handleDrapAndDrop = async (result) => {
         const { destination, source } = result
 
         if (!destination) return;
@@ -34,30 +35,63 @@ const Tasks = () => {
         reorderedData.splice(destinationIndex, 0, removedItem)
 
         dispatch(updateTasks(reorderedData))
+
+        // const oldItem = { ...removedItem, orderNumber: destinationIndex }
+        // const newItem = { ...tasks[destinationIndex], orderNumber: sourceIndex }
+
+        // console.log(oldItem.orderNumber);
+        // console.log(newItem.orderNumber);
+
+        // console.log(oldItem.id);
+        // console.log(newItem.id);
+        
+        
+        // try {
+
+        //     await TasksService.updateTask(oldItem)
+        //     await TasksService.updateTask(newItem)
+        // } catch (error) {
+        //     console.error(error);
+        // }
     }
 
     const clearAllTasksHandler = () => {
         dispatch(updateTasks([]))
+
+        tasks.forEach(async item => {
+            TasksService.deleteTask(item.id)
+        })
     }
 
     const clearFinishedTasksHandler = () => {
         const filteredTasks = tasks.filter(task => !task.isFinished)
         dispatch(updateTasks(filteredTasks))
+
+        tasks.forEach(async item => {
+            if (item.isFinished) {
+                TasksService.deleteTask(item.id)
+            }
+        })
     }
 
     useEffect(() => {
-        tasks.map(task => {
-            if (task.isActive) {
-                setActiveTask(task.title)
-            }
-        })
-    }, [activeTask, tasks]) 
-    
-    
+        if (tasks) {
+            tasks.map(task => {
+                if (task.isActive) {
+                    setActiveTask(task.content)
+                }
+            })
+        }
+        if (!tasks[0]) {
+            setActiveTask('Choose task')
+        }
+    }, [activeTask, tasks])
+
+
 
     return (
         <div className='py-3'>
-            <span className='text-gray-300 cursor-pointer duration-150'>Current Task</span>
+            <span className='text-gray-300 cursor-pointer duration-150'>Active Task</span>
             <h2 className='text-white' >{activeTask}</h2>
             <div className="flex justify-between border-b-2 py-2 ">
                 <span className='text-[20px] text-white '>Tasks</span>

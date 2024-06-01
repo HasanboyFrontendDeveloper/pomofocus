@@ -7,6 +7,7 @@ import { reorderData } from "../../constants";
 import { useDispatch } from "react-redux";
 import { updateTasks } from "../../slices/tasks";
 import { toast } from "react-toastify";
+import TasksService from "../../service/tasks";
 
 const TaskItem = ({ item, index }) => {
     const [open, setOpen] = useState(false);
@@ -16,7 +17,7 @@ const TaskItem = ({ item, index }) => {
     const { tasks } = useSelector(state => state.tasks)
     const dispatch = useDispatch()
 
-    const handleFinished = () => {
+    const handleFinished = async () => {
         const newItem = { ...item, isFinished: !item.isFinished }
 
         let newData = []
@@ -30,24 +31,48 @@ const TaskItem = ({ item, index }) => {
 
 
         dispatch(updateTasks([...newData]))
-        toast.success('Task finished', {
-            theme: 'dark',
-            closeOnClick: true,
-            pauseOnHover: true,
-        })
+        if (!item.isFinished) {
+
+            toast.success('Task finished', {
+                theme: 'dark',
+                closeOnClick: true,
+                pauseOnHover: true,
+            })
+
+        }
+
+
+        try {
+            await TasksService.updateTask(newItem)
+        } catch (error) {
+            console.error(error);
+        }
     }
 
-    const activeHandler = (e) => {
+    const activeHandler = async (e) => {
         if (e.target.classList.value.includes('done')) {
             handleFinished()
         } else {
 
-            const newItem = { ...item, isActive: true }
-            const newData = tasks.map(task => ({ ...task, isActive: false }))
+            const [oldItemFiltered] = tasks.filter(task => task.isActive)
+            const oldItem = oldItemFiltered ? { ...oldItemFiltered, isActive: 0 } : null
+            const newItem = { ...item, isActive: 1 }
+            const newData = tasks.map(task => ({ ...task, isActive: 0 }))
 
             const orederedTasks = reorderData(newData, index, newItem)
 
             dispatch(updateTasks([...orederedTasks]))
+
+            try {
+                if (oldItem) {
+                    await TasksService.updateTask(oldItem)
+                }
+                await TasksService.updateTask(newItem) // Order Number is required
+            } catch (error) {
+                console.error(error);
+            }
+
+
         }
 
 
@@ -67,7 +92,7 @@ const TaskItem = ({ item, index }) => {
 
                             </div>
 
-                            <h1 className={`${item.isFinished && 'line-through'}`}>{item.title}</h1>
+                            <h1 className={`${item.isFinished && 'line-through'}`}>{item.content}</h1>
                         </div>
 
                         <div className="flex">

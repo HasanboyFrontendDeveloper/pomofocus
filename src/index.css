@@ -1,3 +1,32 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.down-to-up {
+  animation: downToUp 1s 1;
+  transition: all 1s ease;
+}
+@keyframes downToUp {
+  0% {
+    transform: translateY(10vh);
+  }
+  100% {
+    transform: translateY(0vh);
+  }
+}
+
+.loader {
+  width: 200px;
+  animation: loader 1s infinite;
+}
+@keyframes loader {
+  0% {
+    width: 100px;
+  }
+  50% {
+    width: 200px;
+  }
+  100% {
+    width: 100px;
+  }
+}
