@@ -6,6 +6,8 @@ import AuthService from '../../service/auth'
 import { useDispatch } from 'react-redux'
 import { getUserFailure, getUserStart, getUserSuccess } from '../../slices/auth'
 import { toast } from 'react-toastify'
+import { jwtDecode } from 'jwt-decode'
+import { GoogleLogin } from '@react-oauth/google'
 
 const Login = () => {
   const [value, setValue] = useState({
@@ -52,9 +54,24 @@ const Login = () => {
   }
 
 
-  const handleGoogleRegister = () => {
-    const redirectUrl = encodeURIComponent("http://localhost:5173/");
-    window.location.href = `http://refotib6.beget.tech/api/auth/google?redirect=${redirectUrl}`;
+  const handleGoogleLogin = async (res) => {
+    const data = jwtDecode(res.credential)
+    console.log(data);
+    dispatch(getUserStart())
+    const user = {
+      email: data.email,
+      password: 1,
+    }
+    try {
+      const data = await AuthService.userLogin(user)
+      localStorage.setItem('Token', data.token)
+      dispatch(getUserSuccess(data.user))
+
+    } catch (error) {
+      dispatch(getUserFailure(error.message))
+      console.error(error);
+      setShowWrongMsg('You did not register with google as this email ')
+    }
   }
 
   return (
@@ -72,12 +89,21 @@ const Login = () => {
 
         <div className="bg-white border-4 w-full py-4 px-5 rounded-lg " >
 
-
-          <Button onClick={handleGoogleRegister} variant='outlined' className='w-full flex items-center justify-center gap-5 '>
+          {/* 
+          <Button onClick={handleGoogleLogin} variant='outlined' className='w-full flex items-center justify-center gap-5 '>
             <img src={google} alt="google" />
             Sing In with Google
-          </Button>
+          </Button> 
+          */}
 
+          <div className="grid place-items-center">
+
+            <GoogleLogin
+              onSuccess={handleGoogleLogin}
+
+              onError={(error) => console.error(error)}
+            />
+          </div>
 
           <div className='flex items-center justify-center gap-3  ' >
 
@@ -114,7 +140,7 @@ const Login = () => {
                 value={value.password}
               />
             </label>
-            <span className='text-center text-red-500 pt-1'>{showWrongMsg}</span>
+            <span className='text-center text-red-500 pt-1 w-[250px] mx-auto '>{showWrongMsg}</span>
             <Button type='submit' className='mt-5 bg-gray-800 hover:bg-gray-900 z-[0] ' >Login with Email</Button>
           </form>
 

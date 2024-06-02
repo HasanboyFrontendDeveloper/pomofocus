@@ -44,13 +44,13 @@ const Settings = ({ setOpenSettings }) => {
     }
   }
 
-  const postTheme = async () => {
-    dispatch(changeColor(curColor))
+  const postTheme = async (color) => {
+    dispatch(changeColor(color))
 
     const newTheme = {
       id: colorId,
       user_id: userId,
-      color: curColor,
+      color
     }
     try {
       if (colorId) {
@@ -59,7 +59,6 @@ const Settings = ({ setOpenSettings }) => {
 
       } else {
         await SettingsService.postThemes(newTheme)
-
 
       }
 
@@ -165,7 +164,6 @@ const Settings = ({ setOpenSettings }) => {
     dispatch(updateNotifyTimer(notifyVal))
 
     postTimer()
-    postTheme()
     postNotify()
 
     setOpenSettings(false)
@@ -198,8 +196,8 @@ const Settings = ({ setOpenSettings }) => {
 
           <div className="flex flex-wrap gap-5 ml-6 ">
             {colors.map((color, index) => (
-              <Button key={index} className={`h-[50px] w-[50px] bg-${color}-400 rounded-lg relative `} onClick={() => setCurColor(color)}>
-                {color === curColor &&
+              <Button key={index} className={`h-[50px] w-[50px] bg-${color}-400 rounded-lg relative `} onClick={() => postTheme(color)}>
+                {color === currentColor &&
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 absolute left-3 top-3 ">
                     <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                   </svg>

@@ -3,6 +3,10 @@ import { checked, google } from '../../assets'
 import { Button } from '@material-tailwind/react'
 import { Link } from 'react-router-dom'
 import AuthService from '../../service/auth'
+import { GoogleLogin, useGoogleLogin } from '@react-oauth/google'
+import { jwtDecode } from 'jwt-decode'
+import { useDispatch } from 'react-redux'
+import { getUserFailure, getUserStart, getUserSuccess } from '../../slices/auth'
 
 const Register = () => {
     const [value, setValue] = useState({
@@ -11,6 +15,8 @@ const Register = () => {
     })
     const [isSuccess, setIsSuccess] = useState(false)
     const [showWrongMsg, setShowWrongMsg] = useState('')
+
+    const dispatch = useDispatch()
 
     const handleValue = (e) => {
         setValue({ ...value, [e.target.name]: e.target.value })
@@ -40,9 +46,32 @@ const Register = () => {
         }
     }
 
-    const handleGoogleRegister = () => {
-        const redirectUrl = encodeURIComponent("http://localhost:5173/");
-        window.location.href = `http://refotib6.beget.tech/api/auth/google?redirect=${redirectUrl}`;
+    const handleGoogleRegister = async (res) => {
+        const data = jwtDecode(res.credential)
+        console.log(data);
+        dispatch(getUserStart())
+
+        const user = {
+            name: data.name,
+            email: data.email,
+            email_verified_at: data.email_verified,
+            password: 1,
+            password_confirmation: 1,
+        }
+
+        try {
+            const data = await AuthService.userRegister(user)
+
+            localStorage.setItem('Token', data.token)
+            dispatch(getUserSuccess(data.user))
+
+            setShowWrongMsg('Your account already registered, please login')
+        } catch (error) {
+            dispatch(getUserFailure(error.message))
+
+            setShowWrongMsg('Your account already registered, \n please login')
+
+        }
     }
 
 
@@ -63,10 +92,23 @@ const Register = () => {
 
                         <div className="bg-white border-4 w-full py-4 px-5 rounded-lg " >
 
+                            <div className="grid place-items-center">
+
+                                <GoogleLogin
+                                    onSuccess={handleGoogleRegister}
+
+                                    onError={(error) => console.error(error)}
+                                />
+                            </div>
+
+                            <h2 className='text-center text-[13px] mt-2  '>If you register with Google, <br /> You can only login with Google </h2>
+
+                            {/* 
                             <Button onClick={handleGoogleRegister} variant='outlined' className='w-full flex items-center justify-center gap-5 '>
                                 <img src={google} alt="google" />
                                 Sing up with Google
-                            </Button>
+                            </Button> 
+                            */}
 
                             <div className='flex items-center justify-center gap-3  ' >
 
@@ -104,7 +146,7 @@ const Register = () => {
                                     />
                                 </label>
 
-                                <span className='text-center text-red-500 pt-1'>{showWrongMsg}</span>
+                                <span className='text-center text-red-500 pt-1 w-[250px] mx-auto '>{showWrongMsg}</span>
 
                                 <Button type='submit' className='mt-5 bg-gray-800 hover:bg-gray-900 duration-200 ' >Sing up with Email</Button>
                             </form>

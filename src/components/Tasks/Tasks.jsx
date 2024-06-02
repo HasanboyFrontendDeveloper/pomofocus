@@ -36,20 +36,20 @@ const Tasks = () => {
 
         dispatch(updateTasks(reorderedData))
 
-        // const oldItem = { ...removedItem, orderNumber: destinationIndex }
-        // const newItem = { ...tasks[destinationIndex], orderNumber: sourceIndex }
+        // const oldItem = { ...removedItem, id: tasks[destinationIndex].id }
+        // const newItem = { ...tasks[destinationIndex], id: removedItem.id }
 
         // console.log(oldItem.orderNumber);
         // console.log(newItem.orderNumber);
 
-        // console.log(oldItem.id);
-        // console.log(newItem.id);
-        
-        
+        // console.log(oldItem.id, 'old Item');
+        // console.log(newItem.id, 'new Item');
+
+
         // try {
 
-        //     await TasksService.updateTask(oldItem)
-        //     await TasksService.updateTask(newItem)
+        //     await TasksService.updateTask(oldItem).finally(async () => await TasksService.updateTask(newItem))
+
         // } catch (error) {
         //     console.error(error);
         // }

@@ -67,7 +67,7 @@ const TaskItem = ({ item, index }) => {
                 if (oldItem) {
                     await TasksService.updateTask(oldItem)
                 }
-                await TasksService.updateTask(newItem) // Order Number is required
+                await TasksService.updateTask(newItem)
             } catch (error) {
                 console.error(error);
             }

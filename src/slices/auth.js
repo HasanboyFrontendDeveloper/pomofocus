@@ -26,15 +26,23 @@ export const authSlice = createSlice({
       state.isLoggedIn = false;
       state.error = action.payload;
     },
+    editProfile: (state, action) => {
+      state.user.name = action.payload;
+    },
     logOut: (state) => {
       state.isLoggedIn = false;
       state.user = [];
-      localStorage.removeItem('Token')
+      localStorage.removeItem("Token");
     },
   },
 });
 
-export const { getUserStart, getUserSuccess, getUserFailure, logOut } =
-  authSlice.actions;
+export const {
+  getUserStart,
+  getUserSuccess,
+  getUserFailure,
+  editProfile,
+  logOut,
+} = authSlice.actions;
 
 export default authSlice.reducer;

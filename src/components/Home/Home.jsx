@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Navbar, Settings, Tasks, Timer } from '../'
+import { Account, Navbar, Settings, Tasks, Timer } from '../'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
 import TasksService from '../../service/tasks';
@@ -11,6 +11,7 @@ import { changeColor, changeColorId, changeNotify, changeNotifyId, getSettingsFi
 
 const Home = () => {
     const [openSettings, setOpenSettings] = useState(false)
+    const [openAccount, setOpenAccount] = useState(false)
 
     const { currentColor } = useSelector(state => state.settings)
     const { userId, user } = useSelector(state => state.auth)
@@ -125,7 +126,7 @@ const Home = () => {
     return (
         <div className={`text-center bg-${currentColor}-400 w-[100%] relative `}>
             <div className="w-[700px] mx-auto">
-                <Navbar setOpenSettings={setOpenSettings} />
+                <Navbar setOpenSettings={setOpenSettings} setOpenAccount={setOpenAccount} />
                 <div className="w-[500px] mx-auto pt-10 pb-[200px] ">
                     <Timer />
                     <Tasks />
@@ -133,6 +134,7 @@ const Home = () => {
                 </div>
             </div>
             {openSettings && <Settings setOpenSettings={setOpenSettings} />}
+            {openAccount && <Account setOpenAccount={setOpenAccount} />}
 
         </div>
     )

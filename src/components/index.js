@@ -10,3 +10,4 @@ export { default as Loader } from "./Loader/Loader";
 export { default as TaskItem } from "./Tasks/TaskItem";
 export { default as AddTask } from "./Tasks/AddTask";
 export { default as Settings } from "./Home/Settings";
+export { default as Account } from "./Home/Account";

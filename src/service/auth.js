@@ -13,6 +13,10 @@ const AuthService = {
     const res = await axios.get("/user");
     return res.data;
   },
+  async editProfile(data) {
+    const res = await axios.put("/profile/update", data);
+    return res;
+  },
   async sendResetLinkEmail(email) {
     const res = await axios.post(`/password/email?email=${email}`);
     return res;

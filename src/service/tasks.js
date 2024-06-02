@@ -15,6 +15,7 @@ const TasksService = {
     },
     async updateTask(data){
         const res = await axios.put(`/tasks/${data.id}`, data)
+        console.log(res);
         return res
     },
     
