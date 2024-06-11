@@ -7,7 +7,7 @@ import { useDispatch } from 'react-redux'
 import { logOut } from '../../slices/auth'
 import { Account } from '../'
 
-const Navbar = ({ setOpenSettings, setOpenAccount }) => {
+const Navbar = ({ setOpenSettings, setOpenAccount, timerLine }) => {
 
     const { isLoggedIn } = useSelector(state => state.auth)
     const dispatch = useDispatch()
@@ -77,6 +77,8 @@ const Navbar = ({ setOpenSettings, setOpenAccount }) => {
                 }
 
             </div>
+
+            <div className={`absolute bottom-[-3px] w-[${timerLine}%] h-1 bg-white rounded-lg`}  style={{width: `${timerLine}%`}} ></div>
         </nav>
     )
 }

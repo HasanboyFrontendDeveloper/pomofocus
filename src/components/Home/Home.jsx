@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Account, Navbar, Settings, Tasks, Timer } from '../'
-import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
 import TasksService from '../../service/tasks';
 import { useSelector } from 'react-redux';
@@ -12,9 +11,10 @@ import { changeColor, changeColorId, changeNotify, changeNotifyId, getSettingsFi
 const Home = () => {
     const [openSettings, setOpenSettings] = useState(false)
     const [openAccount, setOpenAccount] = useState(false)
+    const [timerLine, setTimerLine] = useState(0)
 
     const { currentColor } = useSelector(state => state.settings)
-    const { userId, user } = useSelector(state => state.auth)
+    const { userId } = useSelector(state => state.auth)
 
 
     const dispatch = useDispatch()
@@ -24,14 +24,6 @@ const Home = () => {
             const data = await TasksService.getTasks()
 
             const filteredData = data.filter(item => item.user_id === userId && !item.isDeleted).map(item => ({ ...item, id: String(item.id) }))
-
-            // const orderedData = []
-
-            // filteredData.forEach(task => {
-            //     orderedData[task.orderNumber] = task
-            // })
-
-            // console.log(orderedData);
 
             dispatch(updateTasks(filteredData))
         } catch (error) {
@@ -122,13 +114,16 @@ const Home = () => {
         getNotify()
     }, [])
 
+ 
+
 
     return (
         <div className={`text-center bg-${currentColor}-400 w-[100%] relative `}>
             <div className="w-[700px] mx-auto">
-                <Navbar setOpenSettings={setOpenSettings} setOpenAccount={setOpenAccount} />
+                <Navbar setOpenSettings={setOpenSettings} setOpenAccount={setOpenAccount} timerLine={timerLine} />
+
                 <div className="w-[500px] mx-auto pt-10 pb-[200px] ">
-                    <Timer />
+                    <Timer setTimerLine={setTimerLine} />
                     <Tasks />
 
                 </div>

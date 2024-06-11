@@ -37,16 +37,18 @@ const Account = ({ setOpenAccount }) => {
                 closeOnClick: true,
                 pauseOnHover: true,
             })
+            setOpenAccount(false)
 
         } catch (error) {
             console.error(error);
-            
+
             toast.error('Profile update Failure', {
                 theme: 'dark',
                 closeOnClick: true,
                 pauseOnHover: true,
             })
         }
+
     }
 
     return (

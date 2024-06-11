@@ -8,6 +8,7 @@ import { getUserFailure, getUserStart, getUserSuccess } from '../../slices/auth'
 import { toast } from 'react-toastify'
 import { jwtDecode } from 'jwt-decode'
 import { GoogleLogin } from '@react-oauth/google'
+import { updateTasks } from '../../slices/tasks'
 
 const Login = () => {
   const [value, setValue] = useState({
@@ -30,10 +31,18 @@ const Login = () => {
         email: value.email,
         password: value.password
       }
-      const data = await AuthService.userLogin(user)
-      if (data.user.email_verified_at !== null) {
-        localStorage.setItem('Token', data.token)
-        dispatch(getUserSuccess(data.user))
+      const userData = await AuthService.userLogin(user)
+      console.log(userData);
+      if (userData.user.email_verified_at !== null) {
+        localStorage.setItem('Token', userData.token)
+        dispatch(getUserSuccess(userData.user))
+
+        const newTasks = userData.user.tasks.map(task => ({ ...task, id: String(task.id) }))
+
+        dispatch(updateTasks(newTasks))
+
+        console.log(newTasks);
+
         setShowWrongMsg('logged in')
       } else {
         dispatch(getUserFailure(''))

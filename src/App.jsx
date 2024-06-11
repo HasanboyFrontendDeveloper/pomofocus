@@ -7,6 +7,8 @@ import { useDispatch } from 'react-redux'
 import { getUserFailure, getUserStart, getUserSuccess } from './slices/auth'
 import { getSettingsStart } from './slices/settings'
 import { ToastContainer } from 'react-toastify'
+import { useState } from 'react'
+import { Button } from '@material-tailwind/react'
 
 const App = () => {
 
@@ -38,6 +40,7 @@ const App = () => {
     <>
       {(isLoading || isLoadingSettings) ? <Loader /> : null}
       <ToastContainer />
+
       <Routes>
         {/* <Route path="/" element={<Home />} /> */}
         <Route path="/" element={isLoggedIn ? <Home /> : <Navigate to="/login" replace />} />

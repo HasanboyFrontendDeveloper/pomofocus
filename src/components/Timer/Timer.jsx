@@ -4,9 +4,10 @@ import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { updateTasks } from '../../slices/tasks';
 import { toast } from 'react-toastify';
-import { checked, notify, radar } from '../../assets';
+import { notify, radar } from '../../assets';
+import TasksService from '../../service/tasks';
 
-const Timer = () => {
+const Timer = ({ setTimerLine }) => {
     const [active, setActive] = useState('Pomodoro');
     const [isStart, setIsStart] = useState(false);
 
@@ -18,6 +19,7 @@ const Timer = () => {
     const dispatch = useDispatch()
     const audioRef = useRef()
     const notifyRef = useRef()
+
 
     const [timer, setTimer] = useState({
         minute: 0,
@@ -33,10 +35,14 @@ const Timer = () => {
                 minute: selectedTimer.minute,
                 second: selectedTimer.second,
             });
+            console.log('selectedTimer');
+        } else {
+            console.log('selectedTimer false');
+
         }
     }, [active, timers]);
 
-    const finishTaskHandler = () => {
+    const finishTaskHandler = async () => {
         clearInterval(timerRef.current);
         setIsStart(false)
 
@@ -44,18 +50,27 @@ const Timer = () => {
 
             setActive('Short Break')
 
-            const finishedTask = tasks.filter(task => task.isActive);
+            const [finishedTask] = tasks.filter(task => task.isActive);
 
-            if (finishedTask[0]) {
+            if (finishedTask) {
                 const filteredData = tasks.filter(task => !task.isActive);
 
                 const newTask = {
-                    ...finishedTask[0],
-                    isFinished: true
+                    ...finishedTask,
+                    isFinished: 1,
                 }
                 filteredData.push(newTask)
 
                 dispatch(updateTasks([...filteredData]))
+
+
+                try {
+                    const res = await TasksService.updateTask(newTask)
+
+                    console.log(res);
+                } catch (error) {
+                    console.error(error);
+                }
             }
 
         } else {
@@ -69,24 +84,39 @@ const Timer = () => {
         })
 
         audioRef.current.play()
-
     }
+
+    useEffect(() => {
+        setTimerLine(0)
+    }, [active])
+
+    const minuteToSecond = (time) => {
+        return (Number(time.minute) * 60) + Number(time.second)
+    }
+
+    useEffect(() => {
+        const [curTimer] = timers.filter(time => time.title === active)
+        const fullTime = minuteToSecond(curTimer)
+        const currentTime = fullTime - minuteToSecond(timer)
+
+        const present = ((currentTime / fullTime) * 100).toFixed(2)
+
+        setTimerLine(present)
+    }, [timer])
 
     useEffect(() => {
         if (isStart) {
             const tick = () => {
                 setTimer(prevTimer => {
-                    if (prevTimer.minute === notifyTimer && prevTimer.second === 0) {
+                    if (prevTimer.minute === notifyTimer && prevTimer.second <= 0) {
                         notifyRef.current.play()
                     }
 
-                    if (prevTimer.minute === 0 && prevTimer.second === 0) {
+                    if (prevTimer.minute <= 0 && prevTimer.second <= 0) {
                         finishTaskHandler()
 
-                        audioRef.current.play()
-
                         return prevTimer;
-                    } else if (prevTimer.second === 0) {
+                    } else if (prevTimer.second <= 0) {
                         return { minute: prevTimer.minute - 1, second: 59 };
                     } else {
                         return { ...prevTimer, second: prevTimer.second - 1 };
@@ -111,6 +141,8 @@ const Timer = () => {
     useEffect(() => {
         setCurColor(currentColor)
     }, [currentColor])
+
+
 
     return (
         <div className={`w-full bg-${curColor}-300 rounded-lg py-5 px-2 flex flex-col justify-center items-center gap-5`}>

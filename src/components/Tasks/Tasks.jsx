@@ -7,6 +7,8 @@ import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { updateTasks } from '../../slices/tasks';
 import TasksService from '../../service/tasks';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const Tasks = () => {
     const [open, setOpen] = useState(false);
@@ -36,23 +38,6 @@ const Tasks = () => {
 
         dispatch(updateTasks(reorderedData))
 
-        // const oldItem = { ...removedItem, id: tasks[destinationIndex].id }
-        // const newItem = { ...tasks[destinationIndex], id: removedItem.id }
-
-        // console.log(oldItem.orderNumber);
-        // console.log(newItem.orderNumber);
-
-        // console.log(oldItem.id, 'old Item');
-        // console.log(newItem.id, 'new Item');
-
-
-        // try {
-
-        //     await TasksService.updateTask(oldItem).finally(async () => await TasksService.updateTask(newItem))
-
-        // } catch (error) {
-        //     console.error(error);
-        // }
     }
 
     const clearAllTasksHandler = () => {
